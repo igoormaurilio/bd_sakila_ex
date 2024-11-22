@@ -1,0 +1,415 @@
+set sql_safe_updates=0;
+
+-- ex 1
+select pais from pais;
+
+-- ex2
+select count(pais) from pais;
+
+-- ex3
+select count(pais) from pais 
+where pais like '%a';
+
+-- ex4
+select distinct ano_de_lancamento from filme;
+
+-- ex5
+update filme
+set ano_de_lancamento = '2007'
+where titulo like 'b%';
+
+-- ex6
+select titulo from filme
+where duracao_do_filme > '100' and classificacao = 'g';
+
+-- ex7
+update filme
+set ano_de_lancamento = '2008'
+where duracao_da_locacao < 4 and classificacao = "pg";
+
+-- ex8
+select count(*) from filme
+where preco_da_locacao > 2.40 and classificacao = 'pg-13';
+
+-- ex9
+select distinct(titulo) 
+from idioma a, filme b
+where a.idioma_id = b.idioma_id;
+
+-- ex10
+update filme
+set idioma_id = '6'
+where duracao_da_locacao > 4;
+
+-- ex11
+update filme
+set idioma_id = '3'
+where preco_da_locacao=0.99;
+
+-- ex12
+select classificacao, count(*) as quantity
+from filme
+group by classificacao;
+
+-- ex13
+select distinct(preco_da_locacao)
+from filme;
+
+-- ex14
+select count(*) as quantidade, preco_da_locacao from filme
+group by preco_da_locacao;
+
+-- ex15
+select preco_da_locacao, count(*) as quantity
+from filme
+group by preco_da_locacao
+having count(*) > 340;
+
+-- ex16
+select count(*) as quantidade, titulo from ator, filme, filme_ator
+where filme.filme_id = filme_ator.filme_id and ator.ator_id = filme_ator.ator_id
+group by titulo
+order by quantidade asc;
+
+-- ex17
+select count(*) as quantidade, titulo from ator, filme, filme_ator
+where filme.filme_id = filme_ator.filme_id and ator.ator_id = filme_ator.ator_id
+group by titulo
+having count(*) > 5
+order by quantidade desc;
+
+-- ex18
+select titulo, count(fa.ator_id) quantidade from ator a
+inner join filme f, filme_ator fa
+where idioma_id=3 and f.filme_id = fa.filme_id and a.ator_id=fa.ator_id
+group by titulo
+having count(fa.ator_id) >10
+order by 1 asc;
+
+-- ex19
+select max(duracao_da_locacao) from filme;
+
+-- ex20
+select count(*) from filme
+where duracao_da_locacao = (select max(duracao_da_locacao) from filme);
+
+-- ex21
+select count(*) from filme
+where duracao_da_locacao = 7
+and (idioma_id = 3 or idioma_id = 6);
+
+-- ex22
+select count(*), classificacao, preco_da_locacao from filme
+group by classificacao, preco_da_locacao;
+
+-- ex23
+select max(duracao_do_filme) as valor_max, c.nome
+from filme f, categoria c, filme_categoria fc
+where f.filme_id = fc.filme_id
+and c.categoria_id = fc.categoria_id
+group by c.categoria_id;
+
+-- ex24
+select count(duracao_do_filme) as quantidade, c.nome
+from filme f, categoria c, filme_categoria fc
+where f.filme_id = fc.filme_id
+and c.categoria_id = fc.categoria_id
+group by c.categoria_id;
+
+-- ex25
+select count(f.titulo) as quantidade, c.nome
+from filme f, filme_categoria fa, categoria c
+where f.filme_id = fa.filme_id
+and c.categoria_id = fa.categoria_id
+and f.classificacao = 'g'
+group by c.categoria_id;
+
+-- 26
+select count(f.titulo) as quantidade, c.nome
+from filme f, filme_categoria fa, categoria c
+where f.filme_id = fa.filme_id
+and c.categoria_id = fa.categoria_id
+and f.classificacao = 'g' and 'pg'
+group by c.categoria_id;
+
+-- 27
+select count(filme.filme_id), classificacao, categoria.nome from filme, filme_categoria, categoria
+where filme.filme_id = filme_categoria.filme_id and filme_categoria.categoria_id = categoria.categoria_id
+group by categoria.categoria_id, classificacao;
+
+-- 28
+select count(titulo), primeiro_nome, ultimo_nome from filme, ator, filme_ator
+where ator.ator_id = filme_ator.ator_id and filme.filme_id = filme_ator.filme_id
+group by filme_ator.ator_id
+order by 1 desc;
+
+-- 29
+select ano_de_lancamento, count(*) as quantidade_de_filmes
+from filme
+group by ano_de_lancamento
+order by 1 asc;
+
+-- 33
+select count(cidade), pais
+from cidade, pais
+where pais.pais_id = cidade.pais_id
+group by pais.pais
+order by 1 desc;
+
+-- 34
+select pais.pais, count(cidade.cidade_id) as numero_de_cidades
+from cidade 
+join pais on cidade.pais_id = pais.pais_id
+where cidade.cidade like 'a%'
+group by pais.pais
+order by numero_de_cidades asc;
+
+-- 35
+select pais.pais , count(cidade.cidade_id) as numero_de_cidades
+from cidade 
+join pais on cidade.pais_id = pais.pais_id
+where cidade.cidade like 'a%' 
+group by pais.pais
+having count(cidade.cidade_id) > 3
+order by numero_de_cidades asc;
+
+-- 36
+select pais.pais , count(cidade.cidade_id) as numero_de_cidades
+from cidade 
+join pais on cidade.pais_id = pais.pais_id
+where cidade.cidade like 'a%' or cidade.cidade like '%r%' 
+group by pais.pais
+having count(cidade.cidade_id) > 3
+order by numero_de_cidades asc;
+
+-- 37
+select primeiro_nome from cliente
+join endereco on cliente.endereco_id = endereco.endereco_id
+join cidade on endereco.cidade_id = cidade.cidade_id
+join pais on cidade.pais_id = pais.pais_id
+where pais.pais = 'united states';
+
+-- 38
+select primeiro_nome from cliente
+join endereco on cliente.endereco_id = endereco.endereco_id
+join cidade on endereco.cidade_id = cidade.cidade_id
+join pais on cidade.pais_id = pais.pais_id
+where pais.pais = 'brazil';
+
+-- 39
+select count(c.cliente_id), p.pais
+from cliente c, pais p, cidade ci, endereco e
+where c.endereco_id = e.endereco_id
+and e.cidade_id = ci.cidade_id
+and ci.pais_id = p.pais_id
+group by p.pais;
+
+-- 40
+select p.pais, count(c.cliente_id)
+from cliente c, pais p, cidade ci, endereco e
+where c.endereco_id = e.endereco_id
+and e.cidade_id = ci.cidade_id
+and ci.pais_id = p.pais_id
+group by p.pais
+having count(c.cliente_id) > 10;
+
+-- 41
+select i.nome, avg(f.duracao_do_filme)
+from filme f, idioma i
+where f.idioma_id = i.idioma_id
+group by i.nome;
+
+-- 42
+select count(a.ator_id), f.titulo
+from ator a, filme f, filme_ator fa, idioma i
+where i.idioma_id = f.idioma_id
+and f.filme_id = fa.filme_id
+and a.ator_id = fa.ator_id
+and i.nome = 'english'
+group by f.titulo;
+
+-- 43
+select a.primeiro_nome, a.ultimo_nome
+from filme f, filme_ator fa, ator a
+where f.filme_id = fa.filme_id
+and a.ator_id = fa.ator_id
+group by f.titulo = 'blanket beverly';
+
+-- 44
+select c.nome, count(f.filme_id)
+from categoria c, filme f, filme_categoria fc
+where c.categoria_id = fc.categoria_id
+and f.filme_id = fc.filme_id
+group by c.categoria_id
+having count(f.filme_id) > 60;
+
+-- 45
+select distinct f.titulo, c.primeiro_nome
+from filme f, inventario i, aluguel a, cliente c, endereco e, cidade ci, pais p
+where f.filme_id = i.filme_id
+and i.inventario_id = a.inventario_id
+and a.cliente_id = c.cliente_id
+and c.endereco_id = ci.cidade_id
+and ci.pais_id = p.pais_id
+and p.pais = 'argentina';
+
+-- 46
+select c.primeiro_nome, count(f.titulo), p.pais
+from filme f, inventario i, aluguel a, cliente c, endereco e, cidade ci, pais p
+where f.filme_id = i.filme_id
+and i.inventario_id = a.inventario_id
+and a.cliente_id = c.cliente_id
+and c.endereco_id = ci.cidade_id
+and ci.pais_id = p.pais_id
+and p.pais = 'chile'
+group by 1;
+
+-- 47
+select fun.primeiro_nome, count(f.titulo)
+from filme f, inventario i, aluguel a, funcionario fun
+where f.filme_id = i.filme_id
+and i.inventario_id = a.inventario_id
+and a.funcionario_id = fun.funcionario_id
+group by 1;
+
+-- 48
+select count(f.titulo), c.nome
+from filme f, inventario i, aluguel a, funcionario fu, categoria c, filme_categoria fc
+where f.filme_id = i.filme_id
+and i.inventario_id = a.inventario_id
+and a.funcionario_id = fu.funcionario_id
+and c.categoria_id = fc.categoria_id
+and f.filme_id = fc.filme_id
+group by c.categoria_id;
+
+-- 49
+select titulo, preco_da_locacao
+from filme
+where preco_da_locacao > 2.98;
+select avg(preco_da_locacao) from filme;
+
+-- 50
+select sum(duracao_do_filme) as soma_total, c.nome
+from filme f, categoria c, filme_categoria fc
+where f.filme_id = fc.filme_id
+and c.categoria_id = fc.categoria_id
+group by c.categoria_id;
+
+
+--View
+
+--ex1
+CREATE VIEW filmes_pg_ou_superior AS
+SELECT f.filme_id, f.titulo, f.classificacao
+FROM filme f
+WHERE f.classificacao IN ('PG', 'PG-13', 'R', 'NC-17');
+
+--ex2
+CREATE VIEW clientes_ativos_endereco AS
+SELECT c.cliente_id, c.primeiro_nome, c.ultimo_nome, e.endereco, e.bairro, ci.cidade, p.pais
+FROM cliente c
+JOIN endereco e ON c.endereco_id = e.endereco_id
+JOIN cidade ci ON e.cidade_id = ci.cidade_id
+JOIN pais p ON ci.pais_id = p.pais_id
+WHERE c.ativo = 1;
+
+--ex3
+CREATE VIEW total_pagamentos_por_cliente AS
+SELECT c.cliente_id, c.primeiro_nome, c.ultimo_nome, SUM(p.valor) AS total_pago
+FROM cliente c
+JOIN pagamento p ON c.cliente_id = p.cliente_id
+GROUP BY c.cliente_id;
+
+--Procedure Story
+
+--ex1
+DELIMITER //
+CREATE PROCEDURE atualizar_preco_locacao(
+    IN p_filme_id SMALLINT,
+    IN p_novo_preco DECIMAL(5,2)
+)
+BEGIN
+    UPDATE filme
+    SET preco_da_locacao = p_novo_preco
+    WHERE filme_id = p_filme_id;
+END;
+//
+DELIMITER ;
+
+--ex2
+DELIMITER //
+CREATE PROCEDURE total_alugueis_cliente(IN p_cliente_id SMALLINT)
+BEGIN
+    SELECT COUNT(a.aluguel_id) AS total_alugueis
+    FROM aluguel a
+    WHERE a.cliente_id = p_cliente_id;
+END;
+//
+DELIMITER ;
+
+--ex3
+DELIMITER //
+CREATE PROCEDURE inserir_cliente(
+    IN p_primeiro_nome VARCHAR(45),
+    IN p_ultimo_nome VARCHAR(45),
+    IN p_email VARCHAR(50),
+    IN p_endereco_id SMALLINT,
+    IN p_loja_id TINYINT,
+    IN p_ativo TINYINT,
+    IN p_data_criacao DATETIME
+)
+BEGIN
+    INSERT INTO cliente (primeiro_nome, ultimo_nome, email, endereco_id, loja_id, ativo, data_criacao)
+    VALUES (p_primeiro_nome, p_ultimo_nome, p_email, p_endereco_id, p_loja_id, p_ativo, p_data_criacao);
+END;
+//
+DELIMITER ;
+
+
+--Triggers
+
+--ex1
+DELIMITER //
+CREATE TRIGGER before_filme_delete
+BEFORE DELETE ON filme
+FOR EACH ROW
+BEGIN
+    DECLARE v_count INT;
+    SELECT COUNT(*) INTO v_count
+    FROM aluguel
+    WHERE inventario_id = OLD.filme_id;
+    IF v_count > 0 then
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não foi possível excluir o filme, pois ele já está sendo alugado';
+    END IF;
+END;
+//
+DELIMITER ;
+
+--ex2
+DELIMITER //
+CREATE TRIGGER after_cliente_update
+AFTER UPDATE ON cliente
+FOR EACH ROW
+BEGIN
+    UPDATE cliente
+    SET ultima_atualizacao = CURRENT_TIMESTAMP
+    WHERE cliente_id = NEW.cliente_id;
+END;
+//
+DELIMITER ;
+
+--ex3
+DELIMITER //
+CREATE TRIGGER after_pagamento_insert
+AFTER INSERT ON pagamento
+FOR EACH ROW
+BEGIN
+    INSERT INTO pagamento (cliente_id, funcionario_id, aluguel_id, valor, data_de_pagamento)
+    VALUES (NEW.cliente_id, NEW.funcionario_id, NEW.aluguel_id, NEW.valor, NEW.data_de_pagamento);
+END;
+//
+DELIMITER ;
+
+
+
+
